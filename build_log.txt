@@ -1,0 +1,64 @@
+﻿Γû▓ Next.js 16.2.3 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 6.5s
+  Running TypeScript ...
+node.exe : Failed to type check.
+At C:\Program 
+Files\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotS 
+   pecified: (Failed to type chec  
+  k.:String) [], RemoteException
+    + FullyQualifiedErrorId : Nati 
+   veCommandError
+ 
+
+./app/dashboard/rekam-medis/[id]/ed
+it/page.tsx:58:43
+Type error: Argument of type '{ 
+patient_id: string; keluhan_utama: 
+string | null; 
+riwayat_penyakit_sekarang: string 
+| null; 
+riwayat_penyakit_terdahulu: string 
+| null; riwayat_penyakit_keluarga: 
+string | null; ... 6 more ...; 
+status: "selesai"; }' is not 
+assignable to parameter of type 
+'Partial<MedicalRecord>'.
+  Types of property 
+'keluhan_utama' are incompatible.
+    Type 'string | null' is not 
+assignable to type 'string | 
+undefined'.
+      Type 'null' is not 
+assignable to type 'string | 
+undefined'.
+
+  [90m56 |[0m   [36mconst[0m 
+handleSubmit = [36masync[0m () 
+=> {
+  [90m57 |[0m     [36mconst[0m 
+data = getSubmitData();
+[31m[1m>[0m [90m58 |[0m     
+[36mconst[0m result = 
+[36mawait[0m updateRecord(id, 
+data);
+  [90m   |[0m                    
+                       
+[31m[1m^[0m
+  [90m59 |[0m     [36mif[0m 
+(result) {
+  [90m60 |[0m       
+showToast([32m'Rekam medis 
+berhasil diperbarui!'[0m, 
+[32m'success'[0m);
+  [90m61 |[0m       
+setTimeout(() => router.push([32m`
+/dashboard/rekam-medis/[0m${id[32
+m}`[0m), [35m1000[0m);
+Next.js build worker exited with 
+code: 1 and signal: null
