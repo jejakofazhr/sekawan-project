@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+// Tambahkan import Suspense dari react
+import React, { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useMedicalRecordForm, FORM_STEPS } from '@/hooks/useMedicalRecordForm';
@@ -15,7 +16,8 @@ import EdukasiStep from '@/components/medical-record/EdukasiStep';
 import ObatStep from '@/components/medical-record/ObatStep';
 import { useToast } from '@/components/ui/Toast';
 
-export default function BuatRekamMedisPage() {
+// 1. Pindahkan semua logika utama ke dalam komponen baru ini
+function RekamMedisForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const patientId = searchParams.get('patient');
@@ -56,15 +58,8 @@ export default function BuatRekamMedisPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <>
       <ToastContainer />
-
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/dashboard/rekam-medis" className="hover:text-blue-600 transition-colors">Rekam Medis</Link>
-        <span>/</span>
-        <span className="text-gray-700">Buat Baru</span>
-      </div>
 
       {/* Step Indicator */}
       <StepIndicator steps={FORM_STEPS} currentStep={currentStep} onStepClick={goToStep} />
@@ -94,6 +89,29 @@ export default function BuatRekamMedisPage() {
           </Button>
         )}
       </div>
+    </>
+  );
+}
+
+// 2. Ini adalah halaman utama yang di-export oleh Next.js
+export default function BuatRekamMedisPage() {
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Breadcrumb ditaruh di luar karena tidak butuh useSearchParams */}
+      <div className="flex items-center gap-2 text-sm text-gray-400">
+        <Link href="/dashboard/rekam-medis" className="hover:text-blue-600 transition-colors">Rekam Medis</Link>
+        <span>/</span>
+        <span className="text-gray-700">Buat Baru</span>
+      </div>
+
+      {/* 3. Bungkus komponen form yang pakai useSearchParams dengan Suspense */}
+      <Suspense fallback={
+        <div className="p-8 text-center text-gray-500 bg-white rounded-xl border border-gray-100">
+          Memuat formulir...
+        </div>
+      }>
+        <RekamMedisForm />
+      </Suspense>
     </div>
   );
 }
