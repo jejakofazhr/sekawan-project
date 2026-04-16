@@ -59,12 +59,12 @@ export default function RecordDetail({ record }: RecordDetailProps) {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <p className="text-sm text-gray-500">Tanggal Kunjungan</p>
-          <p className="text-lg font-semibold text-gray-900">
+          <p className="text-xs sm:text-sm text-gray-500">Tanggal Kunjungan</p>
+          <p className="text-base sm:text-lg font-semibold text-gray-900">
             {new Date(record.tanggal_kunjungan).toLocaleDateString('id-ID', {
               weekday: 'long',
               year: 'numeric',
@@ -81,15 +81,15 @@ export default function RecordDetail({ record }: RecordDetailProps) {
       {/* Sections */}
       {sections.map((section) => (
         <div key={section.title} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
+          <div className="px-4 sm:px-5 py-3 bg-gray-50 border-b border-gray-100">
             <h4 className="text-sm font-semibold text-gray-700">
               {section.icon} {section.title}
             </h4>
           </div>
-          <div className="px-5 py-3 divide-y divide-gray-50">
+          <div className="px-4 sm:px-5 py-3 divide-y divide-gray-50">
             {section.items.map((item) => (
-              <div key={item.label} className="flex py-2.5">
-                <span className="text-sm text-gray-500 w-48 shrink-0">{item.label}</span>
+              <div key={item.label} className="flex flex-col sm:flex-row py-2.5 gap-0.5 sm:gap-0">
+                <span className="text-xs sm:text-sm text-gray-400 sm:text-gray-500 sm:w-48 shrink-0">{item.label}</span>
                 <span className="text-sm text-gray-900">{item.value}</span>
               </div>
             ))}
@@ -99,10 +99,10 @@ export default function RecordDetail({ record }: RecordDetailProps) {
 
       {/* Tindakan */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
+        <div className="px-4 sm:px-5 py-3 bg-gray-50 border-b border-gray-100">
           <h4 className="text-sm font-semibold text-gray-700">💉 Tindakan</h4>
         </div>
-        <div className="px-5 py-3">
+        <div className="px-4 sm:px-5 py-3">
           {record.tindakan && record.tindakan.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {record.tindakan.map((t) => (
@@ -117,10 +117,10 @@ export default function RecordDetail({ record }: RecordDetailProps) {
 
       {/* Edukasi */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
+        <div className="px-4 sm:px-5 py-3 bg-gray-50 border-b border-gray-100">
           <h4 className="text-sm font-semibold text-gray-700">📖 Edukasi</h4>
         </div>
-        <div className="px-5 py-3">
+        <div className="px-4 sm:px-5 py-3">
           <p className="text-sm text-gray-700 whitespace-pre-line">
             {record.edukasi || 'Tidak ada edukasi'}
           </p>
@@ -129,18 +129,18 @@ export default function RecordDetail({ record }: RecordDetailProps) {
 
       {/* Obat */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
+        <div className="px-4 sm:px-5 py-3 bg-gray-50 border-b border-gray-100">
           <h4 className="text-sm font-semibold text-gray-700">💊 Resep Obat</h4>
         </div>
-        <div className="px-5 py-3">
+        <div className="px-4 sm:px-5 py-3">
           {record.obat && record.obat.length > 0 ? (
             <div className="space-y-3">
               {record.obat.map((obat, i) => (
-                <div key={i} className="flex items-center gap-4 py-2 border-b border-gray-50 last:border-0">
+                <div key={i} className="flex items-start sm:items-center gap-3 sm:gap-4 py-2 border-b border-gray-50 last:border-0">
                   <span className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold flex items-center justify-center shrink-0">
                     {i + 1}
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-900">{obat.nama}</p>
                     <p className="text-xs text-gray-500">
                       {obat.dosis} — {obat.aturan_pakai}

@@ -72,7 +72,7 @@ export default function PasienPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Data Pasien</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Data Pasien</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola data pasien klinik</p>
         </div>
         <Button onClick={openCreate} icon={
@@ -91,8 +91,8 @@ export default function PasienPage() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -160,6 +160,66 @@ export default function PasienPage() {
         </div>
       </div>
 
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
+              <div className="skeleton h-4 w-32 rounded" />
+              <div className="skeleton h-4 w-full rounded" />
+              <div className="skeleton h-4 w-24 rounded" />
+            </div>
+          ))
+        ) : patients.length > 0 ? (
+          patients.map((patient) => (
+            <div key={patient.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <Link href={`/dashboard/pasien/${patient.id}`} className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                    {patient.nama}
+                  </Link>
+                  <div className="mt-1">
+                    <span className="text-xs font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+                      {patient.no_reg}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="sm" onClick={() => openEdit(patient.id)}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setDeleteId(patient.id)}>
+                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </Button>
+                </div>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-gray-400">Tgl Lahir</span>
+                  <p className="text-gray-700">{new Date(patient.tanggal_lahir).toLocaleDateString('id-ID')}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Jenis Kelamin</span>
+                  <p className="text-gray-700">{patient.jenis_kelamin}</p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-400">Alamat</span>
+                  <p className="text-gray-700 truncate">{patient.alamat}</p>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center text-sm text-gray-400">
+            {search ? 'Tidak ada pasien ditemukan' : 'Belum ada data pasien'}
+          </div>
+        )}
+      </div>
+
       {/* Create/Edit Modal */}
       <Modal
         isOpen={modalOpen}
@@ -177,7 +237,7 @@ export default function PasienPage() {
           <Input label="No. Registrasi" value={formData.no_reg} disabled />
           <Input label="Nama Lengkap *" placeholder="Masukkan nama lengkap pasien" value={formData.nama}
             onChange={(e) => setFormData({ ...formData, nama: e.target.value })} />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Tanggal Lahir *" type="date" value={formData.tanggal_lahir}
               onChange={(e) => setFormData({ ...formData, tanggal_lahir: e.target.value })} />
             <div className="flex flex-col gap-1.5">

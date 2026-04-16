@@ -49,14 +49,14 @@ export default function PatientDetailPage() {
       <div className="flex items-center gap-2 text-sm text-gray-400">
         <Link href="/dashboard/pasien" className="hover:text-blue-600 transition-colors">Pasien</Link>
         <span>/</span>
-        <span className="text-gray-700">{patient.nama}</span>
+        <span className="text-gray-700 truncate">{patient.nama}</span>
       </div>
 
       {/* Patient Info */}
-      <Card className="p-6">
-        <div className="flex items-start justify-between">
+      <Card className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{patient.nama}</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900">{patient.nama}</h1>
             <p className="text-sm text-gray-500 mt-1">
               <span className="font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs">{patient.no_reg}</span>
             </p>
@@ -70,7 +70,7 @@ export default function PatientDetailPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {[
             { label: 'Tanggal Lahir', value: new Date(patient.tanggal_lahir).toLocaleDateString('id-ID') },
             { label: 'Jenis Kelamin', value: patient.jenis_kelamin },
@@ -87,20 +87,20 @@ export default function PatientDetailPage() {
 
       {/* Medical Records */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Riwayat Rekam Medis</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Riwayat Rekam Medis</h2>
         {records.length > 0 ? (
           <div className="space-y-3">
             {records.map((record) => (
               <Link key={record.id} href={`/dashboard/rekam-medis/${record.id}`}>
                 <Card hover className="p-4 mb-3">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-900">{record.diagnosa || 'Tanpa diagnosa'}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">
                         {record.keluhan_utama} • {new Date(record.tanggal_kunjungan).toLocaleDateString('id-ID')}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       {record.icd_10 && (
                         <span className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{record.icd_10}</span>
                       )}

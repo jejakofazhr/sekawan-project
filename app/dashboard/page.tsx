@@ -14,17 +14,17 @@ export default function DashboardPage() {
   }, [fetchStats]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Welcome */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500 mt-1">
           Selamat datang di Sekawan Project — Sistem Rekam Medis
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           title="Total Pasien"
           value={loading ? '—' : stats.totalPatients}
@@ -69,16 +69,18 @@ export default function DashboardPage() {
 
       {/* Recent Records */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">Rekam Medis Terbaru</h2>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
+          <h2 className="text-sm sm:text-base font-semibold text-gray-900">Rekam Medis Terbaru</h2>
           <Link
             href="/dashboard/rekam-medis"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium"
           >
             Lihat Semua →
           </Link>
         </div>
-        <div className="overflow-x-auto">
+
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50/50">
@@ -141,16 +143,52 @@ export default function DashboardPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-gray-50">
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="px-4 py-4 space-y-2">
+                <div className="skeleton h-4 w-32 rounded" />
+                <div className="skeleton h-3 w-full rounded" />
+                <div className="skeleton h-3 w-20 rounded" />
+              </div>
+            ))
+          ) : recentRecords.length > 0 ? (
+            recentRecords.map((record) => (
+              <Link key={record.id} href={`/dashboard/rekam-medis/${record.id}`} className="block px-4 py-4 hover:bg-gray-50/50 transition-colors">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900">{record.patient?.nama || '-'}</p>
+                    <p className="text-xs text-gray-400">{record.patient?.no_reg || '-'}</p>
+                  </div>
+                  <Badge variant={record.status === 'selesai' ? 'success' : 'warning'}>
+                    {record.status === 'selesai' ? 'Selesai' : 'Draft'}
+                  </Badge>
+                </div>
+                <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
+                  <span className="truncate">{record.diagnosa || 'Tanpa diagnosa'}</span>
+                  <span className="shrink-0">•</span>
+                  <span className="shrink-0">{new Date(record.tanggal_kunjungan).toLocaleDateString('id-ID')}</span>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="px-4 py-12 text-center text-sm text-gray-400">
+              Belum ada data rekam medis
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         <Link
           href="/dashboard/pasien"
-          className="group bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-blue-200 transition-all duration-200"
+          className="group bg-white rounded-xl border border-gray-100 p-4 sm:p-5 hover:shadow-md hover:border-blue-200 transition-all duration-200"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors">
+            <div className="p-2 sm:p-2.5 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
@@ -164,10 +202,10 @@ export default function DashboardPage() {
 
         <Link
           href="/dashboard/rekam-medis/baru"
-          className="group bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-green-200 transition-all duration-200"
+          className="group bg-white rounded-xl border border-gray-100 p-4 sm:p-5 hover:shadow-md hover:border-green-200 transition-all duration-200"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors">
+            <div className="p-2 sm:p-2.5 bg-emerald-50 rounded-xl group-hover:bg-emerald-100 transition-colors">
               <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -181,10 +219,10 @@ export default function DashboardPage() {
 
         <Link
           href="/dashboard/surat/baru"
-          className="group bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-purple-200 transition-all duration-200"
+          className="group bg-white rounded-xl border border-gray-100 p-4 sm:p-5 hover:shadow-md hover:border-purple-200 transition-all duration-200"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-purple-50 rounded-xl group-hover:bg-purple-100 transition-colors">
+            <div className="p-2 sm:p-2.5 bg-purple-50 rounded-xl group-hover:bg-purple-100 transition-colors">
               <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
               </svg>

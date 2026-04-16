@@ -75,11 +75,11 @@ export default function BuatSuratPage() {
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Buat Surat Baru</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Buat Surat Baru</h1>
         <p className="text-sm text-gray-500 mt-1">Buat surat keterangan sakit atau surat dokter</p>
       </div>
 
-      <Card className="p-6 space-y-5">
+      <Card className="p-4 sm:p-6 space-y-5">
         {/* Jenis Surat */}
         <div className="grid grid-cols-2 gap-3">
           {[
@@ -90,14 +90,14 @@ export default function BuatSuratPage() {
               key={opt.value}
               type="button"
               onClick={() => setFormData({ ...formData, jenis: opt.value })}
-              className={`p-4 rounded-xl border text-left transition-all ${
+              className={`p-3 sm:p-4 rounded-xl border text-left transition-all ${
                 formData.jenis === opt.value
                   ? 'bg-blue-50 border-blue-200 ring-2 ring-blue-500/20'
                   : 'bg-white border-gray-200 hover:border-gray-300'
               }`}
             >
-              <span className="text-2xl">{opt.icon}</span>
-              <p className="text-sm font-semibold text-gray-900 mt-2">{opt.label}</p>
+              <span className="text-xl sm:text-2xl">{opt.icon}</span>
+              <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-1 sm:mt-2">{opt.label}</p>
             </button>
           ))}
         </div>
@@ -140,7 +140,7 @@ export default function BuatSuratPage() {
                 rows={2}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input label="Tanggal Mulai" type="date" value={formData.tanggal_mulai}
                   onChange={(e) => setFormData({ ...formData, tanggal_mulai: e.target.value })} />
                 <Input label="Tanggal Selesai" type="date" value={formData.tanggal_selesai}
@@ -176,7 +176,7 @@ export default function BuatSuratPage() {
                       key={opt}
                       type="button"
                       onClick={() => setPdfExtra({ ...pdfExtra, kondisi: opt })}
-                      className={`p-3 rounded-lg border text-sm font-semibold text-center transition-all ${
+                      className={`p-3 rounded-lg border text-xs sm:text-sm font-semibold text-center transition-all ${
                         pdfExtra.kondisi === opt
                           ? opt === 'SEHAT'
                             ? 'bg-green-50 border-green-300 text-green-700 ring-2 ring-green-500/20'
@@ -198,9 +198,9 @@ export default function BuatSuratPage() {
               />
 
               {/* NB Fields */}
-              <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 space-y-3">
+              <div className="bg-gray-50 rounded-lg border border-gray-200 p-3 sm:p-4 space-y-3">
                 <h4 className="text-sm font-semibold text-gray-700">NB - Pemeriksaan Fisik</h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Input
                     label="Tinggi (cm)"
                     placeholder="Contoh: 170"
@@ -271,11 +271,11 @@ export default function BuatSuratPage() {
       </Card>
 
       {/* Actions */}
-      <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+      <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <Link href="/dashboard/surat">
-          <Button variant="secondary">← Kembali</Button>
+          <Button variant="secondary" className="w-full sm:w-auto">← Kembali</Button>
         </Link>
-        <Button onClick={handleSubmit} loading={saving}>
+        <Button onClick={handleSubmit} loading={saving} className="w-full sm:w-auto">
           💾 Simpan Surat
         </Button>
       </div>

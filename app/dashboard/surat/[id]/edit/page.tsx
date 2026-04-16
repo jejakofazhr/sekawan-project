@@ -102,13 +102,13 @@ export default function EditSuratPage() {
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Surat</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Edit Surat</h1>
         <p className="text-sm text-gray-500 mt-1">
           {surat.jenis === 'surat_sakit' ? '🤒 Surat Sakit' : '👨‍⚕️ Surat Dokter'} — {surat.patient?.nama}
         </p>
       </div>
 
-      <Card className="p-6 space-y-5">
+      <Card className="p-4 sm:p-6 space-y-5">
         <Input
           label="Pekerjaan"
           placeholder="Pekerjaan pasien..."
@@ -136,7 +136,7 @@ export default function EditSuratPage() {
                 onChange={(e) => setPdfExtra({ ...pdfExtra, diagnosa_text: e.target.value })}
                 rows={2}
               />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input label="Tanggal Mulai" type="date" value={formData.tanggal_mulai}
                   onChange={(e) => setFormData({ ...formData, tanggal_mulai: e.target.value })} />
                 <Input label="Tanggal Selesai" type="date" value={formData.tanggal_selesai}
@@ -165,7 +165,7 @@ export default function EditSuratPage() {
                   {(['SEHAT', 'TIDAK SEHAT'] as const).map((opt) => (
                     <button key={opt} type="button"
                       onClick={() => setPdfExtra({ ...pdfExtra, kondisi: opt })}
-                      className={`p-3 rounded-lg border text-sm font-semibold text-center transition-all ${
+                      className={`p-3 rounded-lg border text-xs sm:text-sm font-semibold text-center transition-all ${
                         pdfExtra.kondisi === opt
                           ? opt === 'SEHAT' ? 'bg-green-50 border-green-300 text-green-700 ring-2 ring-green-500/20' : 'bg-red-50 border-red-300 text-red-700 ring-2 ring-red-500/20'
                           : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
@@ -176,9 +176,9 @@ export default function EditSuratPage() {
               </div>
               <Input label="Keperluan" placeholder="Keperluan surat..." value={pdfExtra.keperluan}
                 onChange={(e) => setPdfExtra({ ...pdfExtra, keperluan: e.target.value })} />
-              <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 space-y-3">
+              <div className="bg-gray-50 rounded-lg border border-gray-200 p-3 sm:p-4 space-y-3">
                 <h4 className="text-sm font-semibold text-gray-700">NB - Pemeriksaan Fisik</h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Input label="Tinggi (cm)" type="number" min={0} placeholder="Contoh: 170" value={pdfExtra.tinggi}
                     onChange={(e) => { const v = e.target.value; if (v === '' || Number(v) >= 0) setPdfExtra({ ...pdfExtra, tinggi: v }); }} />
                   <Input label="Berat (kg)" type="number" min={0} placeholder="Contoh: 65" value={pdfExtra.berat}
@@ -204,11 +204,11 @@ export default function EditSuratPage() {
         )}
       </Card>
 
-      <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+      <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <Link href={`/dashboard/surat/${id}`}>
-          <Button variant="secondary">← Kembali</Button>
+          <Button variant="secondary" className="w-full sm:w-auto">← Kembali</Button>
         </Link>
-        <Button onClick={handleSubmit} loading={saving}>💾 Simpan Perubahan</Button>
+        <Button onClick={handleSubmit} loading={saving} className="w-full sm:w-auto">💾 Simpan Perubahan</Button>
       </div>
     </div>
   );

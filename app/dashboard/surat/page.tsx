@@ -44,7 +44,7 @@ export default function SuratPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Surat</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Surat</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola surat keterangan sakit dan surat dokter</p>
         </div>
         <Link href="/dashboard/surat/baru">
@@ -58,7 +58,8 @@ export default function SuratPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -111,6 +112,53 @@ export default function SuratPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3">
+              <div className="skeleton h-4 w-32 rounded" />
+              <div className="skeleton h-4 w-full rounded" />
+              <div className="skeleton h-4 w-24 rounded" />
+            </div>
+          ))
+        ) : suratList.length > 0 ? (
+          suratList.map((surat) => (
+            <div key={surat.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-900">{surat.patient?.nama || '-'}</p>
+                  <p className="text-xs text-gray-400">{surat.patient?.no_reg}</p>
+                </div>
+                <Badge variant={surat.jenis === 'surat_sakit' ? 'warning' : 'info'}>
+                  {surat.jenis === 'surat_sakit' ? 'Surat Sakit' : 'Surat Dokter'}
+                </Badge>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-gray-400">Tanggal</span>
+                  <p className="text-gray-700">{new Date(surat.created_at).toLocaleDateString('id-ID')}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Dokter</span>
+                  <p className="text-gray-700">{surat.nama_dokter || '-'}</p>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-50">
+                <SuratRowActions
+                  surat={surat}
+                  onDelete={() => setDeleteId(surat.id)}
+                />
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-8 text-center text-sm text-gray-400">
+            Belum ada surat dibuat
+          </div>
+        )}
       </div>
 
       <ConfirmDialog

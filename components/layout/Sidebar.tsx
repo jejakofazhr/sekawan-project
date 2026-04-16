@@ -122,7 +122,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <div className="px-4 py-4 border-t border-gray-100">
           <div className="px-3 py-2.5 rounded-xl bg-linear-to-r from-blue-50 to-indigo-50">
             <p className="text-[10px] font-medium text-blue-600">Sekawan Project</p>
-            <p className="text-[10px] text-gray-400">v1.0.0 — Rekam Medis</p>
+            <p className="text-[10px] text-gray-400">v1.1.0 — Rekam Medis</p>
           </div>
         </div>
       </aside>
