@@ -120,11 +120,24 @@ export function usePatients() {
   }, [supabase]);
 
   const generateRegNumber = useCallback(async (): Promise<string> => {
-    const { count } = await supabase
+    // Ambil no_reg tertinggi yang sudah ada agar nomor tetap increment
+    // meskipun ada data pasien yang dihapus sebelumnya.
+    const { data } = await supabase
       .from('patients')
-      .select('*', { count: 'exact', head: true });
+      .select('no_reg')
+      .order('no_reg', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    const nextNum = (count || 0) + 1;
+    let nextNum = 1;
+    if (data?.no_reg) {
+      // no_reg format: "REG-001", ambil bagian angkanya
+      const match = (data.no_reg as string).match(/(\d+)$/);
+      if (match) {
+        nextNum = parseInt(match[1], 10) + 1;
+      }
+    }
+
     return `REG-${String(nextNum).padStart(3, '0')}`;
   }, [supabase]);
 
