@@ -10,6 +10,8 @@ export interface Patient {
   jenis_kelamin: 'Laki-laki' | 'Perempuan';
   alamat: string;
   no_telepon?: string;
+  kategori_objek?: string;
+  imajis?: string;
   created_at: string;
   updated_at: string;
 }
@@ -30,6 +32,13 @@ export interface MedicalRecord {
   riwayat_penyakit_sekarang?: string;
   riwayat_penyakit_terdahulu?: string;
   riwayat_penyakit_keluarga?: string;
+
+  // Vital Signs
+  tekanan_darah?: string;
+  nadi?: string;
+  suhu?: string;
+  respirasi?: string;
+  saturasi?: string;
 
   // Diagnosa
   diagnosa?: string;
@@ -85,6 +94,8 @@ export interface PatientFormData {
   jenis_kelamin: 'Laki-laki' | 'Perempuan' | '';
   alamat: string;
   no_telepon: string;
+  kategori_objek: string;
+  imajis: string;
 }
 
 export interface MedicalRecordFormData {
@@ -94,6 +105,12 @@ export interface MedicalRecordFormData {
   riwayat_penyakit_sekarang: string;
   riwayat_penyakit_terdahulu: string;
   riwayat_penyakit_keluarga: string;
+  // Vital Signs
+  tekanan_darah: string;
+  nadi: string;
+  suhu: string;
+  respirasi: string;
+  saturasi: string;
   // Diagnosa
   diagnosa: string;
   icd_10: string;

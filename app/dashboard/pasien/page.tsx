@@ -11,7 +11,7 @@ import { useToast } from '@/components/ui/Toast';
 import type { PatientFormData } from '@/types/medical-record';
 
 const INITIAL_FORM: PatientFormData = {
-  no_reg: '', nama: '', tanggal_lahir: '', jenis_kelamin: '', alamat: '', no_telepon: '',
+  no_reg: '', nama: '', tanggal_lahir: '', jenis_kelamin: '', alamat: '', no_telepon: '', kategori_objek: '', imajis: '',
 };
 
 export default function PasienPage() {
@@ -38,6 +38,7 @@ export default function PasienPage() {
       setFormData({
         no_reg: p.no_reg, nama: p.nama, tanggal_lahir: p.tanggal_lahir,
         jenis_kelamin: p.jenis_kelamin, alamat: p.alamat, no_telepon: p.no_telepon || '',
+        kategori_objek: p.kategori_objek || '', imajis: p.imajis || '',
       });
       setEditId(id);
       setModalOpen(true);
@@ -255,6 +256,23 @@ export default function PasienPage() {
             onChange={(e) => setFormData({ ...formData, alamat: e.target.value })} />
           <Input label="No. Telepon" placeholder="08xxxxxxxxxx" value={formData.no_telepon}
             onChange={(e) => setFormData({ ...formData, no_telepon: e.target.value })} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-gray-700">Kategori Objek</label>
+              <select className="w-full px-3.5 py-2.5 rounded-lg border border-gray-200 text-sm bg-white"
+                value={formData.kategori_objek}
+                onChange={(e) => setFormData({ ...formData, kategori_objek: e.target.value })}>
+                <option value="">Pilih Kategori...</option>
+                <option value="Umum">Umum</option>
+                <option value="BPJS">BPJS</option>
+                <option value="Asuransi">Asuransi</option>
+                <option value="Karyawan">Karyawan</option>
+                <option value="Mahasiswa">Mahasiswa</option>
+              </select>
+            </div>
+            <Input label="Imajis" placeholder="Masukkan imajis/nomor identitas" value={formData.imajis}
+              onChange={(e) => setFormData({ ...formData, imajis: e.target.value })} />
+          </div>
         </div>
       </Modal>
 

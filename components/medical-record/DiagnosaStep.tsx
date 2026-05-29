@@ -1,10 +1,14 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { Input, Select } from '@/components/ui/Input';
-import { DIAGNOSA_MEDIS } from '@/data/diagnosa-medis';
-import { DIAGNOSA_KEPERAWATAN } from '@/data/diagnosa-keperawatan';
+import { Input } from '@/components/ui/Input';
+import SearchableSelect from '@/components/ui/SearchableSelect';
+import { createClient } from '@/lib/supabase/client';
 import type { MedicalRecordFormData } from '@/types/medical-record';
+
+// Fallback static data (used when DB tables don't exist yet)
+import { DIAGNOSA_MEDIS as STATIC_DIAGNOSA_MEDIS } from '@/data/diagnosa-medis';
+import { DIAGNOSA_KEPERAWATAN as STATIC_DIAGNOSA_KEPERAWATAN } from '@/data/diagnosa-keperawatan';
 
 interface DiagnosaStepProps {
   formData: MedicalRecordFormData;
@@ -13,10 +17,32 @@ interface DiagnosaStepProps {
 }
 
 export default function DiagnosaStep({ formData, onUpdate, errors }: DiagnosaStepProps) {
+  const supabase = createClient();
+  const [diagnosaList, setDiagnosaList] = useState<string[]>(STATIC_DIAGNOSA_MEDIS);
+  const [keperawatanList, setKeperawatanList] = useState(STATIC_DIAGNOSA_KEPERAWATAN);
+
+  // Try to load from Supabase
+  useEffect(() => {
+    const loadDiagnosa = async () => {
+      try {
+        const { data } = await supabase
+          .from('master_diagnosa')
+          .select('nama')
+          .order('nama');
+        if (data && data.length > 0) {
+          setDiagnosaList(data.map((d: { nama: string }) => d.nama));
+        }
+      } catch {
+        // Use static fallback
+      }
+    };
+    loadDiagnosa();
+  }, [supabase]);
+
   // Determine the initial kategori from saved keterangan_diagnosa
   const getInitialKategori = () => {
     if (!formData.keterangan_diagnosa) return '';
-    for (const kat of DIAGNOSA_KEPERAWATAN) {
+    for (const kat of keperawatanList) {
       const found = kat.items.find(
         (item) => `${item.kode}: ${item.nama}` === formData.keterangan_diagnosa
       );
@@ -30,37 +56,37 @@ export default function DiagnosaStep({ formData, onUpdate, errors }: DiagnosaSte
   // Build options for Diagnosa Medis dropdown
   const diagnosaMedisOptions = useMemo(
     () =>
-      DIAGNOSA_MEDIS.map((nama) => ({
+      diagnosaList.map((nama) => ({
         value: nama,
         label: nama,
       })),
-    []
+    [diagnosaList]
   );
 
   // Build options for the Diagnosa Keperawatan category dropdown
   const kategoriOptions = useMemo(
     () =>
-      DIAGNOSA_KEPERAWATAN.map((kat) => ({
+      keperawatanList.map((kat) => ({
         value: kat.value,
         label: kat.label,
       })),
-    []
+    [keperawatanList]
   );
 
   // Build options for the jenis dropdown based on the selected category
   const jenisOptions = useMemo(() => {
-    const selected = DIAGNOSA_KEPERAWATAN.find((kat) => kat.value === kategori);
+    const selected = keperawatanList.find((kat) => kat.value === kategori);
     if (!selected) return [];
     return selected.items.map((item) => ({
       value: `${item.kode}: ${item.nama}`,
       label: `${item.kode}: ${item.nama}`,
     }));
-  }, [kategori]);
+  }, [kategori, keperawatanList]);
 
   // When kategori changes, reset the jenis (keterangan_diagnosa) if it doesn't belong to the new category
   useEffect(() => {
     if (kategori) {
-      const selected = DIAGNOSA_KEPERAWATAN.find((kat) => kat.value === kategori);
+      const selected = keperawatanList.find((kat) => kat.value === kategori);
       if (selected) {
         const currentValid = selected.items.some(
           (item) => `${item.kode}: ${item.nama}` === formData.keterangan_diagnosa
@@ -80,13 +106,13 @@ export default function DiagnosaStep({ formData, onUpdate, errors }: DiagnosaSte
         <p className="text-sm text-gray-500">Tentukan diagnosis medis dan keperawatan</p>
       </div>
 
-      {/* Diagnosa Medis - Dropdown */}
-      <Select
+      {/* Diagnosa Medis - Searchable Dropdown */}
+      <SearchableSelect
         label="Diagnosa Medis *"
-        placeholder="-- Pilih Diagnosa Medis --"
+        placeholder="Cari diagnosa medis..."
         options={diagnosaMedisOptions}
         value={formData.diagnosa}
-        onChange={(e) => onUpdate({ diagnosa: e.target.value })}
+        onChange={(val) => onUpdate({ diagnosa: val })}
         error={errors.diagnosa}
       />
 
@@ -102,23 +128,23 @@ export default function DiagnosaStep({ formData, onUpdate, errors }: DiagnosaSte
       <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <h4 className="text-sm font-semibold text-gray-800">Diagnosa Keperawatan</h4>
 
-        <Select
+        <SearchableSelect
           label="Diagnosa *"
-          placeholder="-- Pilih Diagnosa --"
+          placeholder="Cari kategori diagnosa..."
           options={kategoriOptions}
           value={kategori}
-          onChange={(e) => setKategori(e.target.value)}
+          onChange={(val) => setKategori(val)}
           error={errors.kategori_diagnosa}
         />
 
         {/* Jenis Dropdown - only shown when a category is selected */}
         {kategori && (
-          <Select
+          <SearchableSelect
             label="Jenis *"
-            placeholder="-- Pilih Jenis Diagnosa --"
+            placeholder="Cari jenis diagnosa..."
             options={jenisOptions}
             value={formData.keterangan_diagnosa}
-            onChange={(e) => onUpdate({ keterangan_diagnosa: e.target.value })}
+            onChange={(val) => onUpdate({ keterangan_diagnosa: val })}
             error={errors.keterangan_diagnosa}
           />
         )}

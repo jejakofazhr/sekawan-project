@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { MedicalRecordFormData } from '@/types/medical-record';
 import { TINDAKAN_LIST } from '@/lib/data/obat-list';
+import { createClient } from '@/lib/supabase/client';
 
 interface TindakanStepProps {
   formData: MedicalRecordFormData;
@@ -10,6 +11,32 @@ interface TindakanStepProps {
 }
 
 export default function TindakanStep({ formData, onToggleTindakan }: TindakanStepProps) {
+  const supabase = createClient();
+  const [tindakanList, setTindakanList] = useState<string[]>(TINDAKAN_LIST);
+  const [searchTindakan, setSearchTindakan] = useState('');
+
+  // Try to load tindakan from Supabase
+  useEffect(() => {
+    const loadTindakan = async () => {
+      try {
+        const { data } = await supabase
+          .from('master_tindakan')
+          .select('nama')
+          .order('nama');
+        if (data && data.length > 0) {
+          setTindakanList(data.map((d: { nama: string }) => d.nama));
+        }
+      } catch {
+        // Use static fallback
+      }
+    };
+    loadTindakan();
+  }, [supabase]);
+
+  const filteredTindakan = searchTindakan
+    ? tindakanList.filter((t) => t.toLowerCase().includes(searchTindakan.toLowerCase()))
+    : tindakanList;
+
   return (
     <div className="space-y-6">
       <div>
@@ -17,8 +44,35 @@ export default function TindakanStep({ formData, onToggleTindakan }: TindakanSte
         <p className="text-sm text-gray-500">Pilih tindakan yang dilakukan</p>
       </div>
 
+      {/* Search */}
+      <div className="relative">
+        <svg
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+        <input
+          type="text"
+          placeholder="Cari tindakan medis..."
+          value={searchTindakan}
+          onChange={(e) => setSearchTindakan(e.target.value)}
+          className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-gray-200 text-sm
+            bg-white text-gray-900 placeholder-gray-400
+            transition-all duration-200
+            focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        />
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {TINDAKAN_LIST.map((tindakan) => {
+        {filteredTindakan.map((tindakan) => {
           const isSelected = formData.tindakan.includes(tindakan);
           return (
             <button
@@ -51,6 +105,12 @@ export default function TindakanStep({ formData, onToggleTindakan }: TindakanSte
             </button>
           );
         })}
+
+        {filteredTindakan.length === 0 && (
+          <div className="col-span-2 text-center py-6 text-sm text-gray-400">
+            Tindakan tidak ditemukan
+          </div>
+        )}
       </div>
 
       {formData.tindakan.length > 0 && (

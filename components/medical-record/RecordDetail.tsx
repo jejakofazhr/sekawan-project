@@ -47,6 +47,17 @@ export default function RecordDetail({ record }: RecordDetailProps) {
       ],
     },
     {
+      title: 'Tanda Vital',
+      icon: '❤️',
+      items: [
+        { label: 'Tekanan Darah (TD)', value: record.tekanan_darah || '-' },
+        { label: 'Nadi', value: record.nadi || '-' },
+        { label: 'Suhu', value: record.suhu || '-' },
+        { label: 'Respirasi', value: record.respirasi || '-' },
+        { label: 'Saturasi (SpO2)', value: record.saturasi || '-' },
+      ],
+    },
+    {
       title: 'Diagnosa',
       icon: '🔬',
       items: [

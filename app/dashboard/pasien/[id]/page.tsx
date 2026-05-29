@@ -70,12 +70,14 @@ export default function PatientDetailPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           {[
             { label: 'Tanggal Lahir', value: new Date(patient.tanggal_lahir).toLocaleDateString('id-ID') },
             { label: 'Jenis Kelamin', value: patient.jenis_kelamin },
             { label: 'Alamat', value: patient.alamat },
             { label: 'No. Telepon', value: patient.no_telepon || '-' },
+            { label: 'Kategori Objek', value: patient.kategori_objek || '-' },
+            { label: 'Imajis', value: patient.imajis || '-' },
           ].map((item) => (
             <div key={item.label}>
               <p className="text-xs text-gray-400 mb-0.5">{item.label}</p>

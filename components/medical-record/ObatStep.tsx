@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Input, Select } from '@/components/ui/Input';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Input } from '@/components/ui/Input';
+import SearchableSelect from '@/components/ui/SearchableSelect';
 import Button from '@/components/ui/Button';
 import type { MedicalRecordFormData, ObatItem } from '@/types/medical-record';
 import { OBAT_LIST } from '@/lib/data/obat-list';
+import { createClient } from '@/lib/supabase/client';
 
 interface ObatStepProps {
   formData: MedicalRecordFormData;
@@ -12,7 +14,14 @@ interface ObatStepProps {
   onRemoveObat: (index: number) => void;
 }
 
+interface ObatCategory {
+  kategori: string;
+  items: string[];
+}
+
 export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStepProps) {
+  const supabase = createClient();
+  const [obatList, setObatList] = useState<ObatCategory[]>(OBAT_LIST);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [newObat, setNewObat] = useState<ObatItem>({
     nama: '',
@@ -20,17 +29,52 @@ export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStep
     aturan_pakai: '',
   });
 
-  const categoryOptions = OBAT_LIST.map((cat) => ({
-    value: cat.kategori,
-    label: cat.kategori,
-  }));
+  // Try to load obat from Supabase
+  useEffect(() => {
+    const loadObat = async () => {
+      try {
+        const { data } = await supabase
+          .from('master_obat')
+          .select('kategori, nama')
+          .order('kategori')
+          .order('nama');
+        if (data && data.length > 0) {
+          // Group by kategori
+          const grouped: Record<string, string[]> = {};
+          data.forEach((d: { kategori: string; nama: string }) => {
+            if (!grouped[d.kategori]) grouped[d.kategori] = [];
+            grouped[d.kategori].push(d.nama);
+          });
+          const result: ObatCategory[] = Object.entries(grouped).map(([kategori, items]) => ({
+            kategori,
+            items,
+          }));
+          setObatList(result);
+        }
+      } catch {
+        // Use static fallback
+      }
+    };
+    loadObat();
+  }, [supabase]);
 
-  const obatOptions = selectedCategory
-    ? OBAT_LIST.find((c) => c.kategori === selectedCategory)?.items.map((item) => ({
-        value: item,
-        label: item,
-      })) || []
-    : [];
+  const categoryOptions = useMemo(() =>
+    obatList.map((cat) => ({
+      value: cat.kategori,
+      label: cat.kategori,
+    })),
+    [obatList]
+  );
+
+  const obatOptions = useMemo(() =>
+    selectedCategory
+      ? obatList.find((c) => c.kategori === selectedCategory)?.items.map((item) => ({
+          value: item,
+          label: item,
+        })) || []
+      : [],
+    [selectedCategory, obatList]
+  );
 
   const handleAdd = () => {
     if (newObat.nama && newObat.dosis && newObat.aturan_pakai) {
@@ -51,22 +95,22 @@ export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStep
         <p className="text-sm font-medium text-gray-700">Tambah Obat</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Select
+          <SearchableSelect
             label="Kategori Obat"
             options={categoryOptions}
-            placeholder="Pilih kategori..."
+            placeholder="Cari kategori obat..."
             value={selectedCategory}
-            onChange={(e) => {
-              setSelectedCategory(e.target.value);
+            onChange={(val) => {
+              setSelectedCategory(val);
               setNewObat((prev) => ({ ...prev, nama: '' }));
             }}
           />
-          <Select
+          <SearchableSelect
             label="Nama Obat"
             options={obatOptions}
-            placeholder="Pilih obat..."
+            placeholder="Cari nama obat..."
             value={newObat.nama}
-            onChange={(e) => setNewObat((prev) => ({ ...prev, nama: e.target.value }))}
+            onChange={(val) => setNewObat((prev) => ({ ...prev, nama: val }))}
             disabled={!selectedCategory}
           />
         </div>
