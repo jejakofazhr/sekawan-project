@@ -76,8 +76,6 @@ export default function PatientDetailPage() {
             { label: 'Jenis Kelamin', value: patient.jenis_kelamin },
             { label: 'Alamat', value: patient.alamat },
             { label: 'No. Telepon', value: patient.no_telepon || '-' },
-            { label: 'Kategori Objek', value: patient.kategori_objek || '-' },
-            { label: 'Imajis', value: patient.imajis || '-' },
           ].map((item) => (
             <div key={item.label}>
               <p className="text-xs text-gray-400 mb-0.5">{item.label}</p>

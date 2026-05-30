@@ -10,8 +10,6 @@ export interface Patient {
   jenis_kelamin: 'Laki-laki' | 'Perempuan';
   alamat: string;
   no_telepon?: string;
-  kategori_objek?: string;
-  imajis?: string;
   created_at: string;
   updated_at: string;
 }
@@ -94,8 +92,6 @@ export interface PatientFormData {
   jenis_kelamin: 'Laki-laki' | 'Perempuan' | '';
   alamat: string;
   no_telepon: string;
-  kategori_objek: string;
-  imajis: string;
 }
 
 export interface MedicalRecordFormData {
