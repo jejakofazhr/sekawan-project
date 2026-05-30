@@ -79,7 +79,9 @@ export const OBAT_LIST: ObatCategory[] = [
 ];
 
 // Flat list of all drug names
-export const ALL_OBAT_NAMES: string[] = OBAT_LIST.flatMap((cat) => cat.items);
+export const ALL_OBAT_NAMES: string[] = Array.from(
+  new Set(OBAT_LIST.flatMap((cat) => cat.items))
+);
 
 // Daftar tindakan medis
 export const TINDAKAN_LIST: string[] = [

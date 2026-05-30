@@ -126,8 +126,9 @@ export default function PengaturanPage() {
 
       setModalOpen(false);
       loadItems();
-    } catch (err) {
-      showToast(`Gagal menyimpan: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : typeof err === 'object' && err !== null && 'message' in err ? String((err as { message: string }).message) : 'Unknown error';
+      showToast(`Gagal menyimpan: ${errMsg}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -152,8 +153,9 @@ export default function PengaturanPage() {
       showToast('Data berhasil dihapus', 'success');
       setDeleteId(null);
       loadItems();
-    } catch (err) {
-      showToast(`Gagal menghapus: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : typeof err === 'object' && err !== null && 'message' in err ? String((err as { message: string }).message) : 'Unknown error';
+      showToast(`Gagal menghapus: ${errMsg}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -184,8 +186,13 @@ export default function PengaturanPage() {
 
       showToast('Data berhasil diimport dari data awal!', 'success');
       loadItems();
-    } catch (err) {
-      showToast(`Gagal import: ${err instanceof Error ? err.message : 'Unknown error'}`, 'error');
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : typeof err === 'object' && err !== null && 'message' in err ? String((err as { message: string }).message) : 'Unknown error';
+      if (errMsg.includes('does not exist') || errMsg.includes('relation')) {
+        showToast(`Gagal import: Tabel "${tableName}" belum dibuat di database Supabase. Jalankan script SQL pembuatan tabel terlebih dahulu.`, 'error');
+      } else {
+        showToast(`Gagal import: ${errMsg}`, 'error');
+      }
     } finally {
       setLoading(false);
     }
