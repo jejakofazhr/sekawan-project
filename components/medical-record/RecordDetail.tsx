@@ -154,7 +154,7 @@ export default function RecordDetail({ record }: RecordDetailProps) {
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-900">{obat.nama}</p>
                     <p className="text-xs text-gray-500">
-                      {obat.dosis} — {obat.aturan_pakai}
+                      {obat.aturan_pakai}
                     </p>
                   </div>
                 </div>

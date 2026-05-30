@@ -16,7 +16,6 @@ export interface Patient {
 
 export interface ObatItem {
   nama: string;
-  dosis: string;
   aturan_pakai: string;
 }
 

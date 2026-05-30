@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS medical_records (
   -- Edukasi
   edukasi TEXT,
 
-  -- Obat (JSONB array: [{nama, dosis, aturan_pakai}])
+  -- Obat (JSONB array: [{nama, aturan_pakai}])
   obat JSONB DEFAULT '[]',
 
   -- Status
@@ -87,6 +87,314 @@ CREATE POLICY "auth_all_surat" ON surat
 
 CREATE POLICY "auth_read_allowed_emails" ON allowed_emails
   FOR SELECT USING (auth.role() = 'authenticated');
+
+-- ============================================
+-- MASTER DATA TABLES
+-- ============================================
+CREATE TABLE IF NOT EXISTS master_diagnosa (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nama TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS master_tindakan (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nama TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS master_obat (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nama TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE master_diagnosa ENABLE ROW LEVEL SECURITY;
+ALTER TABLE master_tindakan ENABLE ROW LEVEL SECURITY;
+ALTER TABLE master_obat ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "auth_all_master_diagnosa" ON master_diagnosa
+  FOR ALL USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "auth_all_master_tindakan" ON master_tindakan
+  FOR ALL USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "auth_all_master_obat" ON master_obat
+  FOR ALL USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
+
+-- ============================================
+-- SEED: Master Diagnosa (155 Diagnosa)
+-- ============================================
+INSERT INTO master_diagnosa (nama) VALUES
+  ('Abortus spontan komplit'),
+  ('Abortus insipiens/mengancam'),
+  ('Abortus spontan inkomplit'),
+  ('Alergi makanan'),
+  ('Anemia defisiensi besi'),
+  ('Anemia defisiensi besi pada kehamilan'),
+  ('Angina pectoris'),
+  ('Apendisitis akut'),
+  ('Artritis osteoarthritis'),
+  ('Artritis rheumatoid'),
+  ('Askariasis'),
+  ('Asma bronkial'),
+  ('Astigmatisma ringan'),
+  ('Bells palsy'),
+  ('Benda asing di hidung'),
+  ('Benda asing di konjungtiva'),
+  ('Blefaritis'),
+  ('Bronchitis akut'),
+  ('Buta senja / rabun senja'),
+  ('Cardiorespiratory arrest'),
+  ('Cutaneous larva migran'),
+  ('Delirium (dengan/tnp intox.alkohol/drug)'),
+  ('Demam dengue, DHF'),
+  ('Demam tifoid'),
+  ('Dementia'),
+  ('Dermatitis atopic (kecuali recalcitrant)'),
+  ('Dermatitis kontak alergika'),
+  ('Dermatitis kontak iritan'),
+  ('Dermatitis numularis'),
+  ('Dermatitis seboroik'),
+  ('Tinea kapitis'),
+  ('Tinea barbae'),
+  ('Tinea fasialis'),
+  ('Tinea korporis'),
+  ('Tinea manus'),
+  ('Tinea unguium'),
+  ('Tinea kruris'),
+  ('Tinea pedis'),
+  ('Diabetes mellitus tipe 1'),
+  ('Diabetes mellitus tipe 2'),
+  ('Disentri basiler dan amuba'),
+  ('Dyslipidemia'),
+  ('Eklampsia'),
+  ('Epilepsy'),
+  ('Epistaksis'),
+  ('Exanthematous drug eruption'),
+  ('Fixed drug eruption'),
+  ('Faringitis'),
+  ('Filariasis'),
+  ('Flour albus/ vaginal discharge non-GO'),
+  ('Fraktur terbuka, tertutup'),
+  ('Furunkel di hidung'),
+  ('Gagal jantung akut'),
+  ('Gagal jantung kronik'),
+  ('Gangguan campuran anxietas dan depresi'),
+  ('Gangguan psikotik'),
+  ('Gastritis'),
+  ('Gastroenteritis (kolera, giardiasis)'),
+  ('Glaucoma akut'),
+  ('Gonore'),
+  ('Hemoroid grade 1,2'),
+  ('Hepatitis A'),
+  ('Hepatitis B'),
+  ('Herpes simpleks tanpa komplikasi'),
+  ('Herpes zoster tanpa komplikasi'),
+  ('Hyperemesis gravidarum'),
+  ('Hiperglikemia hyperosmolar non ketotik'),
+  ('Hipermetropia ringan'),
+  ('Hipertensi esensial'),
+  ('Hiperurisemia (gout)'),
+  ('Hipoglikemia ringan'),
+  ('HIV AIDS tanpa komplikasi'),
+  ('Hordeolum'),
+  ('Infark miokard'),
+  ('Infark serebral / stroke'),
+  ('Infeksi pada umbilikal'),
+  ('Infeksi saluran kemih'),
+  ('Influenza'),
+  ('Insomnia'),
+  ('Intoleransi makanan'),
+  ('Kandidiasis mulut'),
+  ('Katarak'),
+  ('Kehamilan normal'),
+  ('Kejang demam'),
+  ('Keracunan makanan'),
+  ('Ketuban pecah dini (KPD)'),
+  ('Kolesistitis'),
+  ('Konjungtivitis'),
+  ('Laryngitis'),
+  ('Lepra'),
+  ('Leptospirosis (tanpa komplikasi)'),
+  ('Liken simplek kronis/neurodermatitis'),
+  ('Limfadenitis'),
+  ('Lipoma'),
+  ('Lka bakar derajat 1,2'),
+  ('Malabsorbsi makanan'),
+  ('Malaria'),
+  ('Malnutrisi energy-protein'),
+  ('Mastitis'),
+  ('Mata kering'),
+  ('Migraine'),
+  ('Miliaria'),
+  ('Myopia ringan'),
+  ('Moluskum kontangiosum'),
+  ('Morbili tanpa komplikasi'),
+  ('Napkin eczema (diaper rash)'),
+  ('Obesitas'),
+  ('Otitis eksterna'),
+  ('Otitis media akut'),
+  ('Parotitis'),
+  ('Pedikulosis kapitis'),
+  ('Penyakit cacing tambang'),
+  ('Perdarahan saluran cerna bagian atas'),
+  ('Perdarahan saluran cerna bagian bawah'),
+  ('Perdarahan post partum'),
+  ('Perdarahan subkonjungtiva'),
+  ('Peritonitis'),
+  ('Pertussis'),
+  ('Persalinan lama'),
+  ('Pitiriasis rosea'),
+  ('Pioderma'),
+  ('Pitiriasis versikolor'),
+  ('Pneumonia aspirasi'),
+  ('Pneumonia, bronkopneumonia'),
+  ('Polimialgia reumatik'),
+  ('Pre-eklampsia'),
+  ('Presbiopia'),
+  ('Rabies'),
+  ('Reaksi anafilaktik'),
+  ('Reaksi gigitan serangga (insect bite)'),
+  ('Refluks gastroesofageal (GERD)'),
+  ('Rhinitis akut'),
+  ('Rhinitis alergika'),
+  ('Rhinitis vasomotor'),
+  ('Rupture perineum grade 1,2'),
+  ('Serumen prop'),
+  ('Sifilis'),
+  ('Scabies'),
+  ('Skistosomiasis'),
+  ('Status epileptikus'),
+  ('Strongiloidiasis'),
+  ('Syok (septik, hipovolemik, kardiogenik, neurogenic)'),
+  ('Taeniasis'),
+  ('Takikardia'),
+  ('Tension headache'),
+  ('Tetanus'),
+  ('Tiroktosikosis'),
+  ('Tonsillitis'),
+  ('Tuberculosis paru tanpa komplikasi'),
+  ('Urtikaria (akut dan kronis)'),
+  ('Vaginitis'),
+  ('Varisela tanpa komplikasi'),
+  ('Vertigo (BPPV)'),
+  ('Veruka vulgaris'),
+  ('Vulvitis')
+ON CONFLICT (nama) DO NOTHING;
+
+-- ============================================
+-- SEED: Master Tindakan Medis
+-- ============================================
+INSERT INTO master_tindakan (nama) VALUES
+  ('Pemeriksaan fisik'),
+  ('Pemeriksaan darah lengkap'),
+  ('Pemeriksaan urine'),
+  ('Perawatan luka'),
+  ('Rawat jalan'),
+  ('Suntik'),
+  ('Infus RL'),
+  ('Infus NaCl'),
+  ('Nebulizer'),
+  ('EKG'),
+  ('Rontgen'),
+  ('USG'),
+  ('Hecting / Jahit luka'),
+  ('Insisi abses'),
+  ('Pemasangan kateter'),
+  ('Pemasangan NGT'),
+  ('Ganti verband'),
+  ('Observasi'),
+  ('Konsultasi spesialis')
+ON CONFLICT (nama) DO NOTHING;
+
+-- ============================================
+-- SEED: Master Obat (flat list, tanpa kategori)
+-- ============================================
+INSERT INTO master_obat (nama) VALUES
+  ('Omeprazol'),
+  ('Lansoprazol'),
+  ('Cimetidine'),
+  ('Ranitidine'),
+  ('Sucralfate'),
+  ('Antasida'),
+  ('Amoxicillin'),
+  ('Cefadroxil'),
+  ('Erythromycin'),
+  ('Ciprofloxacin'),
+  ('Metronidazole'),
+  ('Cotrimoxazole'),
+  ('Cefixime'),
+  ('Doxycycline'),
+  ('Cetirizine'),
+  ('Loratadine'),
+  ('CTM'),
+  ('Dexamethasone'),
+  ('Methylprednisolone'),
+  ('Ondansetron'),
+  ('Domperidone'),
+  ('Metoclopramide'),
+  ('Paracetamol'),
+  ('Ibuprofen'),
+  ('Asam Mefenamat'),
+  ('Ketorolac'),
+  ('Tramadol'),
+  ('Loperamide'),
+  ('Attapulgite'),
+  ('Zinc'),
+  ('Piroxicam'),
+  ('Meloxicam'),
+  ('Diclofenac'),
+  ('Salbutamol'),
+  ('Aminophylline'),
+  ('Bromhexine'),
+  ('Ambroxol'),
+  ('N-Acetylcysteine'),
+  ('Pseudoephedrine'),
+  ('Codein'),
+  ('Dextromethorphan'),
+  ('OBH'),
+  ('Guaifenesin'),
+  ('Vitamin B Complex'),
+  ('Vitamin B1'),
+  ('Vitamin B6'),
+  ('Vitamin B12'),
+  ('Vitamin C'),
+  ('Vitamin D'),
+  ('Cendo Xitrol'),
+  ('Insto'),
+  ('Cendo Lyteers'),
+  ('Bioplacenton'),
+  ('Hidrocortisone'),
+  ('Gentamicin cream'),
+  ('Ketoconazole cream'),
+  ('Miconazole'),
+  ('Otopain'),
+  ('Tarivid Otic'),
+  ('Amlodipine'),
+  ('Captopril'),
+  ('Bisoprolol'),
+  ('Furosemide'),
+  ('Spironolactone'),
+  ('Candesartan'),
+  ('Gabapentin'),
+  ('Carbamazepine'),
+  ('Amitriptyline'),
+  ('Alprazolam'),
+  ('Diazepam'),
+  ('Metformin'),
+  ('Glimepiride'),
+  ('Glibenclamide'),
+  ('Acarbose'),
+  ('Flavoxate'),
+  ('NaCl 0.9%'),
+  ('Ringer Laktat'),
+  ('Dextrose 5%'),
+  ('KaEN 3B')
+ON CONFLICT (nama) DO NOTHING;
 
 -- ============================================
 -- SEED DATA: 3 Dummy Patients

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/Input';
 import SearchableSelect from '@/components/ui/SearchableSelect';
 import Button from '@/components/ui/Button';
 import type { MedicalRecordFormData, ObatItem } from '@/types/medical-record';
-import { OBAT_LIST } from '@/lib/data/obat-list';
+import { ALL_OBAT_NAMES } from '@/lib/data/obat-list';
 import { createClient } from '@/lib/supabase/client';
 
 interface ObatStepProps {
@@ -14,42 +14,24 @@ interface ObatStepProps {
   onRemoveObat: (index: number) => void;
 }
 
-interface ObatCategory {
-  kategori: string;
-  items: string[];
-}
-
 export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStepProps) {
   const supabase = createClient();
-  const [obatList, setObatList] = useState<ObatCategory[]>(OBAT_LIST);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [obatNames, setObatNames] = useState<string[]>(ALL_OBAT_NAMES);
   const [newObat, setNewObat] = useState<ObatItem>({
     nama: '',
-    dosis: '',
     aturan_pakai: '',
   });
 
-  // Try to load obat from Supabase
+  // Load obat names from Supabase (flat list, no kategori)
   useEffect(() => {
     const loadObat = async () => {
       try {
         const { data } = await supabase
           .from('master_obat')
-          .select('kategori, nama')
-          .order('kategori')
+          .select('nama')
           .order('nama');
         if (data && data.length > 0) {
-          // Group by kategori
-          const grouped: Record<string, string[]> = {};
-          data.forEach((d: { kategori: string; nama: string }) => {
-            if (!grouped[d.kategori]) grouped[d.kategori] = [];
-            grouped[d.kategori].push(d.nama);
-          });
-          const result: ObatCategory[] = Object.entries(grouped).map(([kategori, items]) => ({
-            kategori,
-            items,
-          }));
-          setObatList(result);
+          setObatNames(data.map((d: { nama: string }) => d.nama));
         }
       } catch {
         // Use static fallback
@@ -58,28 +40,18 @@ export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStep
     loadObat();
   }, [supabase]);
 
-  const categoryOptions = useMemo(() =>
-    obatList.map((cat) => ({
-      value: cat.kategori,
-      label: cat.kategori,
-    })),
-    [obatList]
-  );
-
   const obatOptions = useMemo(() =>
-    selectedCategory
-      ? obatList.find((c) => c.kategori === selectedCategory)?.items.map((item) => ({
-          value: item,
-          label: item,
-        })) || []
-      : [],
-    [selectedCategory, obatList]
+    obatNames.map((nama) => ({
+      value: nama,
+      label: nama,
+    })),
+    [obatNames]
   );
 
   const handleAdd = () => {
-    if (newObat.nama && newObat.dosis && newObat.aturan_pakai) {
+    if (newObat.nama && newObat.aturan_pakai) {
       onAddObat(newObat);
-      setNewObat({ nama: '', dosis: '', aturan_pakai: '' });
+      setNewObat({ nama: '', aturan_pakai: '' });
     }
   };
 
@@ -96,31 +68,11 @@ export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStep
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SearchableSelect
-            label="Kategori Obat"
-            options={categoryOptions}
-            placeholder="Cari kategori obat..."
-            value={selectedCategory}
-            onChange={(val) => {
-              setSelectedCategory(val);
-              setNewObat((prev) => ({ ...prev, nama: '' }));
-            }}
-          />
-          <SearchableSelect
             label="Nama Obat"
             options={obatOptions}
             placeholder="Cari nama obat..."
             value={newObat.nama}
             onChange={(val) => setNewObat((prev) => ({ ...prev, nama: val }))}
-            disabled={!selectedCategory}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Input
-            label="Dosis"
-            placeholder="Contoh: 500mg, 10ml..."
-            value={newObat.dosis}
-            onChange={(e) => setNewObat((prev) => ({ ...prev, dosis: e.target.value }))}
           />
           <Input
             label="Aturan Pakai"
@@ -134,7 +86,7 @@ export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStep
           variant="secondary"
           size="sm"
           onClick={handleAdd}
-          disabled={!newObat.nama || !newObat.dosis || !newObat.aturan_pakai}
+          disabled={!newObat.nama || !newObat.aturan_pakai}
           icon={
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -159,7 +111,7 @@ export default function ObatStep({ formData, onAddObat, onRemoveObat }: ObatStep
               <div>
                 <p className="text-sm font-semibold text-gray-900">{obat.nama}</p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {obat.dosis} — {obat.aturan_pakai}
+                  {obat.aturan_pakai}
                 </p>
               </div>
               <button

@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 
 // Static fallback data
 import { DIAGNOSA_MEDIS } from '@/data/diagnosa-medis';
-import { OBAT_LIST } from '@/lib/data/obat-list';
+import { ALL_OBAT_NAMES } from '@/lib/data/obat-list';
 import { TINDAKAN_LIST } from '@/lib/data/obat-list';
 
 type ActiveTab = 'diagnosa' | 'tindakan' | 'obat';
@@ -18,7 +18,6 @@ type ActiveTab = 'diagnosa' | 'tindakan' | 'obat';
 interface MasterItem {
   id: string;
   nama: string;
-  kategori?: string;
   created_at?: string;
 }
 
@@ -33,7 +32,6 @@ export default function PengaturanPage() {
   const [editItem, setEditItem] = useState<MasterItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [formNama, setFormNama] = useState('');
-  const [formKategori, setFormKategori] = useState('');
   const [useSupabase, setUseSupabase] = useState(true);
 
   const tableName = activeTab === 'diagnosa' ? 'master_diagnosa' : activeTab === 'tindakan' ? 'master_tindakan' : 'master_obat';
@@ -70,13 +68,7 @@ export default function PengaturanPage() {
     } else if (activeTab === 'tindakan') {
       setItems(TINDAKAN_LIST.map((nama, i) => ({ id: `static-${i}`, nama })));
     } else {
-      const flat: MasterItem[] = [];
-      OBAT_LIST.forEach((cat, ci) => {
-        cat.items.forEach((nama, ii) => {
-          flat.push({ id: `static-${ci}-${ii}`, nama, kategori: cat.kategori });
-        });
-      });
-      setItems(flat);
+      setItems(ALL_OBAT_NAMES.map((nama, i) => ({ id: `static-${i}`, nama })));
     }
   };
 
@@ -87,23 +79,18 @@ export default function PengaturanPage() {
 
   const filteredItems = items.filter((item) => {
     const q = search.toLowerCase();
-    return (
-      item.nama.toLowerCase().includes(q) ||
-      (item.kategori && item.kategori.toLowerCase().includes(q))
-    );
+    return item.nama.toLowerCase().includes(q);
   });
 
   const openCreate = () => {
     setEditItem(null);
     setFormNama('');
-    setFormKategori('');
     setModalOpen(true);
   };
 
   const openEdit = (item: MasterItem) => {
     setEditItem(item);
     setFormNama(item.nama);
-    setFormKategori(item.kategori || '');
     setModalOpen(true);
   };
 
@@ -121,9 +108,6 @@ export default function PengaturanPage() {
     setLoading(true);
     try {
       const payload: Record<string, string> = { nama: formNama.trim() };
-      if (activeTab === 'obat' && formKategori.trim()) {
-        payload.kategori = formKategori.trim();
-      }
 
       if (editItem && !editItem.id.startsWith('static-')) {
         const { error } = await supabase
@@ -193,12 +177,7 @@ export default function PengaturanPage() {
         const { error } = await supabase.from(tableName).insert(payload);
         if (error) throw error;
       } else {
-        const payload: { nama: string; kategori: string }[] = [];
-        OBAT_LIST.forEach((cat) => {
-          cat.items.forEach((nama) => {
-            payload.push({ nama, kategori: cat.kategori });
-          });
-        });
+        const payload = ALL_OBAT_NAMES.map((nama) => ({ nama }));
         const { error } = await supabase.from(tableName).insert(payload);
         if (error) throw error;
       }
@@ -248,7 +227,7 @@ export default function PengaturanPage() {
         ))}
       </div>
 
-      {/* Info banner */}
+      {/* Info banner — only shown when static data fallback is active */}
       {!useSupabase && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <div className="flex-1">
@@ -268,7 +247,7 @@ export default function PengaturanPage() {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1">
           <Input
-            placeholder={`Cari ${activeTab === 'obat' ? 'obat berdasarkan nama atau kategori' : 'berdasarkan nama'}...`}
+            placeholder="Cari berdasarkan nama..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -290,9 +269,6 @@ export default function PengaturanPage() {
               <tr className="bg-gray-50/50">
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3 w-12">#</th>
                 <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Nama</th>
-                {activeTab === 'obat' && (
-                  <th className="text-left text-xs font-medium text-gray-500 px-6 py-3">Kategori</th>
-                )}
                 <th className="text-right text-xs font-medium text-gray-500 px-6 py-3">Aksi</th>
               </tr>
             </thead>
@@ -302,9 +278,6 @@ export default function PengaturanPage() {
                   <tr key={i}>
                     <td className="px-6 py-3"><div className="skeleton h-4 w-6 rounded" /></td>
                     <td className="px-6 py-3"><div className="skeleton h-4 w-full rounded" /></td>
-                    {activeTab === 'obat' && (
-                      <td className="px-6 py-3"><div className="skeleton h-4 w-24 rounded" /></td>
-                    )}
                     <td className="px-6 py-3"><div className="skeleton h-4 w-16 rounded ml-auto" /></td>
                   </tr>
                 ))
@@ -313,15 +286,6 @@ export default function PengaturanPage() {
                   <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-3 text-xs text-gray-400">{idx + 1}</td>
                     <td className="px-6 py-3 text-sm text-gray-900">{item.nama}</td>
-                    {activeTab === 'obat' && (
-                      <td className="px-6 py-3">
-                        {item.kategori && (
-                          <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-                            {item.kategori}
-                          </span>
-                        )}
-                      </td>
-                    )}
                     <td className="px-6 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <Button variant="ghost" size="sm" onClick={() => openEdit(item)}>
@@ -340,7 +304,7 @@ export default function PengaturanPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={activeTab === 'obat' ? 4 : 3} className="px-6 py-12 text-center text-sm text-gray-400">
+                  <td colSpan={3} className="px-6 py-12 text-center text-sm text-gray-400">
                     {search ? 'Tidak ditemukan' : 'Belum ada data'}
                   </td>
                 </tr>
@@ -371,14 +335,6 @@ export default function PengaturanPage() {
             value={formNama}
             onChange={(e) => setFormNama(e.target.value)}
           />
-          {activeTab === 'obat' && (
-            <Input
-              label="Kategori"
-              placeholder="Masukkan kategori obat..."
-              value={formKategori}
-              onChange={(e) => setFormKategori(e.target.value)}
-            />
-          )}
         </div>
       </Modal>
 
